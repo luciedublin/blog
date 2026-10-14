@@ -107,6 +107,19 @@
         color: #44443f;
       }
       .entry ul li { margin-bottom: 4px; }
+      /* ---------- Project button ---------- */
+      .project-btn {
+        display: inline-block;
+        margin-top: 14px;
+        text-decoration: none;
+        background: var(--accent);
+        color: #fff;
+        border-radius: 999px;
+        padding: 8px 24px;
+        font-size: 0.85rem;
+        transition: opacity 0.15s ease;
+      }
+      .project-btn:hover { opacity: 0.85; }
       /* ---------- Contact ---------- */
       .contact {
         text-align: center;
@@ -150,11 +163,11 @@
       <!-- To use your photo: name it photo.jpg and put it next to index.html -->
       <h1>Lucie Heymann</h1>
       <p class="tagline">
-        I help B2B software companies grow internationally, through channels (direct or partners),
-        process and team optimization. 25 years of experience, flexible and tech savvy.
+        I help B2B software companies grow internationally, through channels,
+        process and team optimization.
       </p>
       <p class="short">
-        I help you scale up your organization: streamlined processes will make you fast and
+        Scale up your organization: streamlined processes will make you fast,
         properly coached people will make you win.
       </p>
     </div>
@@ -171,6 +184,32 @@
       <div id="entries"></div>
     </section>
 
+    <!-- ============ VIBE CODING PROJECTS ============ -->
+    <section>
+      <h2>My Vibe Coding Projects</h2>
+      <div class="entry">
+        <div class="top">
+          <div>
+            <h3>🎯 Deal Debrief Generator</h3>
+            <div class="where">Interactive sales coaching tool</div>
+          </div>
+          <div class="when">2026</div>
+        </div>
+        <p style="font-size: 0.9rem; color: #44443f; margin-top: 10px">
+          A tool born from 25+ years of B2B pattern recognition: answer 8
+          honest questions about a lost or stalled deal, get a scored debrief
+          with coaching insights on what to do differently next time.
+        </p>
+        <a
+          class="project-btn"
+          href="https://YOUR-USERNAME.github.io/deal-debrief/"
+          target="_blank"
+        >
+          Try it →
+        </a>
+      </div>
+    </section>
+
     <!-- ============ CONTACT ============ -->
     <div class="contact">
       <h2 style="text-align:center">Get in touch</h2>
@@ -184,9 +223,9 @@
     <script>
       // ---- Edit your skills here (label = category, items = skills) ----
       const SKILLS = [
-        { label: "Languages", items: ["French", "German", "English", "Spanish"] },
-        { label: "Tools", items: ["Salesforce", "Hubspot", "PowerBI", "and more..."] },
-        { label: "Strengths", items: ["Curiosity", "Adaptability", "Can-do mindset"] },
+        { label: "Languages", items: ["French", "German", "English"] },
+        { label: "Tools", items: ["Add", "your", "tools", "here"] },
+        { label: "Strengths", items: ["Curiosity", "Adaptability"] },
       ];
 
       // ---- Edit your experience / projects here ----
