@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Onboarding Plan — First 90 Days</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23c2410c'/%3E%3Ctext x='50' y='70' font-size='48' text-anchor='middle' fill='%23fafaf8'%3E%F0%9F%9A%80%3C/text%3E%3C/svg%3E"
+    />
+    <style>
+      :root {
+        --bg: #fafaf8;
+        --text: #1c1c1a;
+        --muted: #8a8a86;
+        --accent: #c2410c;
+        --border: #e7e7e3;
+        --card: #ffffff;
+        --good: #15803d;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        font-family: Georgia, "Times New Roman", serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.65;
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 48px 24px 64px;
+      }
+      header { text-align: center; margin-bottom: 32px; }
+      h1 { font-size: 1.9rem; font-weight: 400; letter-spacing: -0.02em; }
+      header p { color: var(--muted); margin-top: 6px; font-size: 0.95rem; }
+      /* ---------- Progress ---------- */
+      .progress-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 22px 28px;
+        text-align: center;
+        margin-bottom: 28px;
+      }
+      .progress-bar {
+        height: 12px;
+        border-radius: 999px;
+        background: var(--border);
+        overflow: hidden;
+        margin: 12px 0 8px;
+      }
+      .progress-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: var(--accent);
+        transition: width 0.3s ease;
+      }
+      .progress-text { font-size: 0.85rem; color: var(--muted); }
+      .progress-text strong { color: var(--accent); font-size: 1.1rem; }
+      /* ---------- Sections ---------- */
+      section { margin-bottom: 36px; }
+      h2 {
+        font-size: 0.8rem;
+        font-weight: 400;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+      .section-note { font-size: 0.8rem; color: var(--muted); font-style: italic; margin-bottom: 12px; }
+      ul { list-style: none; }
+      li {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px 18px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+      li:hover { border-color: var(--accent); }
+      li .box {
+        flex: none;
+        width: 20px; height: 20px;
+        border: 1.5px solid var(--muted);
+        border-radius: 5px;
+        margin-top: 3px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        color: #fff;
+      }
+      li.done { opacity: 0.55; }
+      li.done .box { background: var(--good); border-color: var(--good); }
+      li.done .text { text-decoration: line-through; }
+      .text { font-size: 0.92rem; }
+      .text small { display: block; color: var(--muted); font-size: 0.8rem; }
+      .reset {
+        text-align: center;
+        margin-top: 28px;
+      }
+      .reset button {
+        font-family: inherit; font-size: 0.85rem;
+        background: none; border: 1px solid var(--border); border-radius: 999px;
+        padding: 8px 24px; cursor: pointer; color: var(--muted);
+      }
+      .reset button:hover { color: var(--bad, #b91c1c); border-color: #b91c1c; }
+      footer { margin-top: 48px; text-align: center; color: var(--muted); font-size: 0.78rem; }
+      @media (max-width: 480px) {
+        body { padding: 28px 16px; }
+        h1 { font-size: 1.4rem; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>🚀 Onboarding Plan — First 90 Days</h1>
+      <p>Work through the list at your own pace — your progress is saved automatically.</p>
+    </header>
+
+    <div class="progress-card">
+      <div class="progress-text"><strong id="pct">0%</strong> complete</div>
+      <div class="progress-bar"><div class="progress-fill" id="fill" style="width:0%"></div></div>
+      <div class="progress-text" id="count">0 of 0 tasks done</div>
+    </div>
+
+    <main id="plan"></main>
+
+    <div class="reset">
+      <button id="resetBtn">↺ Reset all progress (e.g. for a new hire)</button>
+    </div>
+
+    <footer>© 2026 — Vibe-coded with ❤ | Progress is stored in this browser only.</footer>
+
+    <script>
+      // ================================================================
+      // THE PLAN — edit your tasks here!
+      // Each phase has a title, a note, and a list of tasks.
+      // A task can have an optional explanation in "sub".
+      // ================================================================
+      const PLAN = [
+        {
+          title: "Week 1 — Settle in",
+          note: "Get the basics working before anything else.",
+          tasks: [
+            { text: "Get laptop, accounts and email working", sub: "IT ticket if anything is missing" },
+            { text: "Meet your buddy and your manager", sub: "Book 30 min with each" },
+            { text: "Complete HR paperwork", sub: "" },
+            { text: "Read the team wiki / welcome guide", sub: "" },
+          ],
+        },
+        {
+          title: "Weeks 2–4 — Learn the ropes",
+          note: "Product, customers, and how we sell.",
+          tasks: [
+            { text: "Product training completed", sub: "Demo environment access included" },
+            { text: "Shadow 3 customer calls", sub: "Note what objections come up" },
+            { text: "Learn the CRM basics", sub: "Pipelines, stages, logging activities" },
+            { text: "First role-play with your manager", sub: "" },
+          ],
+        },
+        {
+          title: "Month 2 — First steps alone",
+          note: "Supervised independence.",
+          tasks: [
+            { text: "First solo customer call", sub: "" },
+            { text: "Build your first pipeline", sub: "" },
+            { text: "Internal presentation about a customer insight", sub: "" },
+          ],
+        },
+        {
+          title: "Month 3 — Fly solo",
+          note: "Full ownership, with coaching on demand.",
+          tasks: [
+            { text: "Run a full sales cycle end-to-end", sub: "" },
+            { text: "90-day review with your manager", sub: "You bring the self-assessment" },
+          ],
+        },
+      ];
+
+      // ================================================================
+      // App logic — progress saved in the browser (localStorage)
+      // ================================================================
+      const KEY = "onboarding-progress-v1";
+      let done = {};
+      try { done = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { done = {}; }
+
+      const plan = document.getElementById("plan");
+      let total = 0;
+      PLAN.forEach((phase, pi) => {
+        total += phase.tasks.length;
+        const sec = document.createElement("section");
+        sec.innerHTML = `<h2>${phase.title}</h2><p class="section-note">${phase.note}</p>`;
+        const ul = document.createElement("ul");
+        phase.tasks.forEach((task, ti) => {
+          const id = `${pi}-${ti}`;
+          const li = document.createElement("li");
+          if (done[id]) li.classList.add("done");
+          li.innerHTML = `
+            <div class="box">${done[id] ? "✓" : ""}</div>
+            <div class="text">${task.text}${task.sub ? `<small>${task.sub}</small>` : ""}</div>`;
+          li.onclick = () => {
+            li.classList.toggle("done");
+            done[id] = li.classList.contains("done");
+            li.querySelector(".box").textContent = done[id] ? "✓" : "";
+            localStorage.setItem(KEY, JSON.stringify(done));
+            updateProgress();
+          };
+          ul.appendChild(li);
+        });
+        sec.appendChild(ul);
+        plan.appendChild(sec);
+      });
+
+      function updateProgress() {
+        const doneCount = Object.values(done).filter(Boolean).length;
+        const pct = total ? Math.round((doneCount / total) * 100) : 0;
+        document.getElementById("pct").textContent = pct + "%";
+        document.getElementById("fill").style.width = pct + "%";
+        document.getElementById("count").textContent = `${doneCount} of ${total} tasks done`;
+      }
+      updateProgress();
+
+      document.getElementById("resetBtn").onclick = () => {
+        if (confirm("Reset all progress? Use this when a new hire starts with this page.")) {
+          localStorage.removeItem(KEY);
+          location.reload();
+        }
+      };
+    </script>
+  </body>
+</html>
