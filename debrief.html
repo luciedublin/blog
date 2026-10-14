@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Deal Debrief Generator</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23c2410c'/%3E%3Ctext x='50' y='70' font-size='52' text-anchor='middle' fill='%23fafaf8'%3E%F0%9F%8E%AF%3C/text%3E%3C/svg%3E"
+    />
+    <style>
+      :root {
+        --bg: #fafaf8;
+        --text: #1c1c1a;
+        --muted: #8a8a86;
+        --accent: #c2410c;
+        --border: #e7e7e3;
+        --card: #ffffff;
+        --good: #15803d;
+        --warn: #b45309;
+        --bad: #b91c1c;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        font-family: Georgia, "Times New Roman", serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.65;
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 48px 24px 64px;
+      }
+      header { text-align: center; margin-bottom: 36px; }
+      h1 { font-size: 1.9rem; font-weight: 400; letter-spacing: -0.02em; }
+      header p { color: var(--muted); margin-top: 8px; font-size: 0.95rem; }
+      header p em { color: var(--accent); }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 24px 28px;
+        margin-bottom: 14px;
+      }
+      .q { margin-bottom: 22px; }
+      .q:last-child { margin-bottom: 0; }
+      .q .label { font-size: 0.95rem; margin-bottom: 8px; }
+      .q .label .num { color: var(--accent); font-size: 0.8rem; margin-right: 6px; }
+      .options { display: flex; flex-wrap: wrap; gap: 8px; }
+      .options button {
+        font-family: inherit;
+        font-size: 0.85rem;
+        padding: 7px 16px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: transparent;
+        color: var(--text);
+        cursor: pointer;
+        transition: all 0.15s ease;
+        text-align: left;
+      }
+      .options button:hover { border-color: var(--accent); }
+      .options button.selected {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+      }
+      .actions { text-align: center; margin: 28px 0; }
+      .actions button {
+        font-family: inherit;
+        font-size: 1rem;
+        padding: 12px 36px;
+        border: none;
+        border-radius: 999px;
+        background: var(--text);
+        color: var(--bg);
+        cursor: pointer;
+        transition: background 0.15s ease;
+      }
+      .actions button:hover { background: var(--accent); }
+      .actions button:disabled { opacity: 0.35; cursor: not-allowed; }
+      /* ---------- Result ---------- */
+      #result { display: none; }
+      .score-box { text-align: center; margin-bottom: 24px; }
+      .score-ring {
+        width: 130px; height: 130px;
+        border-radius: 50%;
+        margin: 0 auto 14px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 2rem;
+        color: #fff;
+      }
+      .verdict { font-size: 1.15rem; font-style: italic; }
+      .verdict small { display: block; color: var(--muted); font-style: normal; font-size: 0.8rem; margin-top: 4px; }
+      .finding { margin-bottom: 14px; padding: 16px 20px; border-radius: 8px; border-left: 4px solid; }
+      .finding h3 { font-size: 0.95rem; font-weight: 400; margin-bottom: 4px; }
+      .finding p { font-size: 0.88rem; color: #44443f; }
+      .finding.ok   { background: #f0faf1; border-color: var(--good); }
+      .finding.warn { background: #fdf8ef; border-color: var(--warn); }
+      .finding.bad  { background: #fdf2f2; border-color: var(--bad); }
+      .restart { text-align: center; margin-top: 24px; }
+      .restart button {
+        font-family: inherit; font-size: 0.9rem;
+        background: none; border: 1px solid var(--border); border-radius: 999px;
+        padding: 8px 24px; cursor: pointer; color: var(--muted);
+      }
+      .restart button:hover { color: var(--text); border-color: var(--text); }
+      footer { margin-top: 48px; text-align: center; color: var(--muted); font-size: 0.78rem; }
+      @media (max-width: 480px) {
+        body { padding: 28px 16px; }
+        h1 { font-size: 1.4rem; }
+        .card { padding: 18px 16px; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>🎯 Deal Debrief Generator</h1>
+      <p>Lost or stalled deal? Answer honestly, get the truth.
+        <em>Built on 25+ years of B2B pattern recognition.</em></p>
+    </header>
+
+    <main>
+      <!-- ============ QUIZ ============ -->
+      <div id="quiz">
+        <div class="card" id="questions"></div>
+        <div class="actions">
+          <button id="analyze" disabled>Analyze the deal →</button>
+        </div>
+      </div>
+
+      <!-- ============ RESULT ============ -->
+      <div id="result">
+        <div class="card">
+          <div class="score-box">
+            <div class="score-ring" id="ring"></div>
+            <div class="verdict" id="verdict"></div>
+          </div>
+          <div id="findings"></div>
+        </div>
+        <div class="restart">
+          <button onclick="location.reload()">↺ Debrief another deal</button>
+        </div>
+      </div>
+    </main>
+
+    <footer>© 2026 — Vibe-coded with ❤ | A coaching tool, not a crystal ball.</footer>
+
+    <script>
+      // ================================================================
+      // QUESTIONS — each answer has a weight (0-2) and an insight.
+      // Tune these to match YOUR pattern recognition!
+      // ================================================================
+      const QUESTIONS = [
+        {
+          id: "champion",
+          label: "Did you have an identified, active champion inside the account?",
+          options: [
+            { text: "Yes — they sold internally for us", score: 2 },
+            { text: "A friendly contact, but not a driver", score: 1 },
+            { text: "No — we never had real internal support", score: 0 },
+          ],
+        },
+        {
+          id: "pain",
+          label: "Was there a clearly articulated, quantified business pain?",
+          options: [
+            { text: "Yes — with numbers the customer agreed to", score: 2 },
+            { text: "Some pain, but vague or unquantified", score: 1 },
+            { text: "No — it was mostly our idea of what they need", score: 0 },
+          ],
+        },
+        {
+          id: "budget",
+          label: "Was the budget confirmed and sufficient?",
+          options: [
+            { text: "Confirmed, with a defined amount", score: 2 },
+            { text: "Probably, but never explicitly discussed", score: 1 },
+            { text: "Unknown or 'we'll find it if it's worth it'", score: 0 },
+          ],
+        },
+        {
+          id: "decision",
+          label: "Did you understand the real decision process (not the official one)?",
+          options: [
+            { text: "Yes — I knew who decides and how", score: 2 },
+            { text: "Partially — official process only", score: 1 },
+            { text: "No — it surprised us at the end", score: 0 },
+          ],
+        },
+        {
+          id: "competing",
+          label: "Where were you against the competition?",
+          options: [
+            { text: "Preferred vendor / unique position", score: 2 },
+            { text: "In a real horse race", score: 1 },
+            { text: "Column fodder / incumbent was strong", score: 0 },
+          ],
+        },
+        {
+          id: "timeline",
+          label: "Was there a compelling event driving a real deadline?",
+          options: [
+            { text: "Yes — contract end, project launch, budget expiry…", score: 2 },
+            { text: "Soft target date, often slipping", score: 1 },
+            { text: "No compelling event", score: 0 },
+          ],
+        },
+        {
+          id: "exec",
+          label: "Did you ever engage an economic decision-maker (exec level)?",
+          options: [
+            { text: "Yes — met them, understood their agenda", score: 2 },
+            { text: "Only briefly or via others", score: 1 },
+            { text: "Never got above user/buyer level", score: 0 },
+          ],
+        },
+        {
+          id: "followup",
+          label: "After your last meeting, what happened to momentum?",
+          options: [
+            { text: "Next steps were agreed with dates — then it stalled anyway", score: 1 },
+            { text: "We were chasing them for answers", score: 0 },
+            { text: "They went quiet after we shared pricing/proposal", score: 0 },
+          ],
+        },
+      ];
+
+      // ================================================================
+      // INSIGHTS — what each weak point means, and what to do next time.
+      // ================================================================
+      const INSIGHTS = {
+        champion: {
+          title: "Champion",
+          warn: "A friendly contact is not a champion. Next time, test them: will they spend their own political capital to move your deal forward?",
+          bad: "Without an internal champion, you were betting on your own sales skills against an entire organization. Qualify for a champion early — or walk away early.",
+        },
+        pain: {
+          title: "Business pain",
+          warn: "Vague pain means the customer couldn't build an internal business case. Help your contact quantify the pain — in THEIR numbers.",
+          bad: "If the customer never owned the pain, you were selling a solution to a problem they didn't know they had. Discovery comes before demo.",
+        },
+        budget: {
+          title: "Budget",
+          warn: "'Probably has budget' is how deals die quietly in Q4. Budget is a fact to verify, not an assumption to comfort yourself with.",
+          bad: "No confirmed budget means the deal was never real — it was a conversation. Ask for budget evidence before investing proposal effort.",
+        },
+        decision: {
+          title: "Decision process",
+          warn: "The official process tells you the rules; the real process tells you the winner. Map who influences, who vetoes, and what they fear.",
+          bad: "Deals are lost in rooms you're not in. If the decision surprised you, you were not mapped into the real process.",
+        },
+        competing: {
+          title: "Competitive position",
+          warn: "In a horse race, differentiate or lose on price. Ask yourself: what could we have done that the competitor couldn't copy?",
+          bad: "Being column fodder means you were there to make someone else's procurement look diligent. Change the buying criteria or don't play.",
+        },
+        timeline: {
+          title: "Compelling event",
+          warn: "Without a real deadline, 'next quarter' becomes a lifestyle. Tie your proposal to a date that hurts if missed.",
+          bad: "No compelling event = no urgency = no deal. Find the contract expiry, the project launch, the audit — something with a date.",
+        },
+        exec: {
+          title: "Executive engagement",
+          warn: "Users buy features; executives buy outcomes. Get even 20 minutes at exec level to test your value story.",
+          bad: "Deals approved above the buyer's level get killed above the buyer's level. If you never met the economic buyer, you never really competed.",
+        },
+        followup: {
+          title: "Momentum",
+          warn: "Agreed next steps that stall are a signal, not noise. Silence after a proposal usually means someone else is moving.",
+          bad: "When you chase, you're behind. If the customer stops investing effort, treat that as a qualification event — ask directly: 'What changed?'",
+        },
+      };
+
+      // ================================================================
+      // App logic
+      // ================================================================
+      const answers = {}; // id -> score
+      const questionsEl = document.getElementById("questions");
+
+      QUESTIONS.forEach((q, qi) => {
+        const div = document.createElement("div");
+        div.className = "q";
+        div.innerHTML = `
+          <div class="label"><span class="num">${qi + 1}</span>${q.label}</div>
+          <div class="options"></div>`;
+        const opts = div.querySelector(".options");
+        q.options.forEach((o) => {
+          const btn = document.createElement("button");
+          btn.textContent = o.text;
+          btn.onclick = () => {
+            opts.querySelectorAll("button").forEach((b) => b.classList.remove("selected"));
+            btn.classList.add("selected");
+            answers[q.id] = o.score;
+            maybeEnable();
+          };
+          opts.appendChild(btn);
+        });
+        questionsEl.appendChild(div);
+      });
+
+      function maybeEnable() {
+        document.getElementById("analyze").disabled =
+          Object.keys(answers).length < QUESTIONS.length;
+      }
+
+      document.getElementById("analyze").onclick = () => {
+        const total = QUESTIONS.reduce((s, q) => s + answers[q.id], 0);
+        const max = QUESTIONS.length * 2;
+        const pct = Math.round((total / max) * 100);
+
+        // Score ring
+        const ring = document.getElementById("ring");
+        ring.textContent = pct + "%";
+        ring.style.background =
+          pct >= 65 ? "var(--good)" : pct >= 40 ? "var(--warn)" : "var(--bad)";
+
+        // Verdict
+        const verdict = document.getElementById("verdict");
+        if (pct >= 65) {
+          verdict.innerHTML = `You ran a solid, well-qualified process.<small>The deal failing doesn't always mean you did — but re-check the weak spots below.</small>`;
+        } else if (pct >= 40) {
+          verdict.innerHTML = `This deal was winnable with sharper qualification.<small>Several fundamentals were shaky — see below.</small>`;
+        } else {
+          verdict.innerHTML = `This deal was lost before it started.<small>Good news: the lessons below are the cheapest sales training you'll ever get.</small>`;
+        }
+
+        // Findings: one per question, colored by score
+        const findings = document.getElementById("findings");
+        findings.innerHTML = QUESTIONS.map((q) => {
+          const s = answers[q.id];
+          const cls = s === 2 ? "ok" : s === 1 ? "warn" : "bad";
+          const icon = s === 2 ? "✅" : s === 1 ? "⚠️" : "❌";
+          const text =
+            s === 2
+              ? "Strong on this dimension. Keep doing what you did here."
+              : INSIGHTS[q.id][s === 1 ? "warn" : "bad"];
+          return `<div class="finding ${cls}"><h3>${icon} ${INSIGHTS[q.id].title}</h3><p>${text}</p></div>`;
+        }).join("");
+
+        // Show result, hide quiz
+        document.getElementById("quiz").style.display = "none";
+        document.getElementById("result").style.display = "block";
+        window.scrollTo(0, 0);
+      };
+    </script>
+  </body>
+</html>
