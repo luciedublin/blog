@@ -31,6 +31,18 @@
       header { text-align: center; margin-bottom: 32px; }
       h1 { font-size: 1.9rem; font-weight: 400; letter-spacing: -0.02em; }
       header p { color: var(--muted); margin-top: 6px; font-size: 0.95rem; }
+      .meta-form .label { font-size: 0.95rem; margin-bottom: 6px; }
+      .meta-form input {
+        font-family: inherit;
+        font-size: 0.9rem;
+        width: 100%;
+        padding: 9px 14px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--bg);
+        color: var(--text);
+      }
+      .meta-form input:focus { outline: 2px solid var(--accent); border-color: var(--accent); }
       /* ---------- Progress ---------- */
       .progress-card {
         background: var(--card);
@@ -120,6 +132,18 @@
       <p>Work through the list at your own pace — your progress is saved automatically.</p>
     </header>
 
+    <!-- Newbie sign-in gate -->
+    <div class="card gate" id="gate" style="margin-bottom: 28px">
+      <div class="meta-form">
+        <div class="label">Welcome! What's your name?</div>
+        <input type="text" id="newbieName" placeholder="e.g. Anna" />
+      </div>
+      <div class="actions" style="margin: 14px 0 0">
+        <button id="startBtn">Start my onboarding →</button>
+      </div>
+      <div class="who" id="whoIs" style="display: none; margin-top: 14px; font-size: 0.85rem; color: var(--muted)"></div>
+    </div>
+
     <div class="progress-card">
       <div class="progress-text"><strong id="pct">0%</strong> complete</div>
       <div class="progress-bar"><div class="progress-fill" id="fill" style="width:0%"></div></div>
@@ -182,13 +206,58 @@
 
       // ================================================================
       // App logic — progress saved in the browser (localStorage)
-      // ================================================================
+      // AND synced to a shared Google Sheet for the manager.
+      // ⚠️ PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE (ends with /exec)
+      const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkjWZ_nyvo7NjNnHyZK8KwViRrg2Ksuz1L1Pw2Yqog3HvlTU-WrDgiMpAQ1txO8jFIJQ/exec";
+      const NAME_KEY = "onboarding-newbie-name";
       const KEY = "onboarding-progress-v1";
       let done = {};
+      let newbieName = localStorage.getItem(NAME_KEY) || null;
       try { done = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { done = {}; }
+
+      // ---- Gate: sign in on first visit ----
+      const gate = document.getElementById("gate");
+      function showGate() {
+        if (newbieName) {
+          gate.querySelector(".meta-form").style.display = "none";
+          document.getElementById("startBtn").style.display = "none";
+          const who = document.getElementById("whoIs");
+          who.style.display = "block";
+          who.textContent = `Onboarding in progress for: ${newbieName} ✎ (clear browser data to reset)`;
+        }
+      }
+      document.getElementById("startBtn").onclick = () => {
+        const name = document.getElementById("newbieName").value.trim();
+        if (!name) { alert("Please enter your name first."); return; }
+        newbieName = name;
+        localStorage.setItem(NAME_KEY, name);
+        syncToSheet(true); // register with start date
+        showGate();
+      };
+      showGate();
+
+      // ---- Sync to Google Sheet ----
+      function syncToSheet(isStart) {
+        if (!newbieName) return; // not signed in yet
+        const doneCount = Object.values(done).filter(Boolean).length;
+        const payload = {
+          name: newbieName,
+          started: isStart,
+          done: doneCount,
+          total: totalTasks,
+          timestamp: new Date().toISOString(),
+        };
+        fetch(SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload),
+        }).catch(() => {}); // silent: page works even if sync fails
+      }
 
       const plan = document.getElementById("plan");
       let total = 0;
+      const totalTasks = PLAN.reduce((s, p) => s + p.tasks.length, 0);
       PLAN.forEach((phase, pi) => {
         total += phase.tasks.length;
         const sec = document.createElement("section");
@@ -207,6 +276,7 @@
             li.querySelector(".box").textContent = done[id] ? "✓" : "";
             localStorage.setItem(KEY, JSON.stringify(done));
             updateProgress();
+            syncToSheet(false);
           };
           ul.appendChild(li);
         });
