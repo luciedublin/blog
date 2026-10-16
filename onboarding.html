@@ -223,28 +223,29 @@
           document.getElementById("startBtn").style.display = "none";
           const who = document.getElementById("whoIs");
           who.style.display = "block";
-          who.textContent = `Onboarding in progress for: ${newbieName} ✎ (clear browser data to reset)`;
+          who.textContent = `Onboarding in progress for: ${newbieName}`;
         }
       }
-      document.getElementById("startBtn").onclick = () => {
+      document.getElementById("startBtn").onclick = async () => {
         const name = document.getElementById("newbieName").value.trim();
         if (!name) { alert("Please enter your name first."); return; }
         newbieName = name;
         localStorage.setItem(NAME_KEY, name);
-        syncToSheet(true); // register with start date
+        await restoreFromSheet(); // load previous progress for this name (if any)
+        syncToSheet();             // register / update the sheet
         showGate();
       };
       showGate();
 
-      // ---- Sync to Google Sheet ----
-      function syncToSheet(isStart) {
-        if (!newbieName) return; // not signed in yet
-        const doneCount = Object.values(done).filter(Boolean).length;
+      // ---- Sync to Google Sheet (sheet stores WHICH tasks are done) ----
+      function syncToSheet() {
+        if (!newbieName) return;
+        const doneIds = Object.keys(done).filter((k) => done[k]);
         const payload = {
           name: newbieName,
-          started: isStart,
-          done: doneCount,
+          done: doneIds.length,
           total: totalTasks,
+          ids: doneIds.join(","),
           timestamp: new Date().toISOString(),
         };
         fetch(SCRIPT_URL, {
@@ -255,34 +256,63 @@
         }).catch(() => {}); // silent: page works even if sync fails
       }
 
+      // ---- Restore progress from the sheet (source of truth) ----
+      async function restoreFromSheet() {
+        if (!newbieName) return;
+        try {
+          const res = await fetch(`${SCRIPT_URL}?name=${encodeURIComponent(newbieName)}`);
+          const data = await res.json();
+          if (data && Array.isArray(data.ids)) {
+            const restored = {};
+            data.ids.forEach((id) => (restored[id] = true));
+            done = restored; // sheet wins: same progress on any device
+            localStorage.setItem(KEY, JSON.stringify(done));
+            renderPlan();
+          }
+        } catch (e) {
+          // Offline or script not reachable: keep localStorage progress
+        }
+      }
+
       const plan = document.getElementById("plan");
       let total = 0;
       const totalTasks = PLAN.reduce((s, p) => s + p.tasks.length, 0);
-      PLAN.forEach((phase, pi) => {
-        total += phase.tasks.length;
-        const sec = document.createElement("section");
-        sec.innerHTML = `<h2>${phase.title}</h2><p class="section-note">${phase.note}</p>`;
-        const ul = document.createElement("ul");
-        phase.tasks.forEach((task, ti) => {
-          const id = `${pi}-${ti}`;
-          const li = document.createElement("li");
-          if (done[id]) li.classList.add("done");
-          li.innerHTML = `
-            <div class="box">${done[id] ? "✓" : ""}</div>
-            <div class="text">${task.text}${task.sub ? `<small>${task.sub}</small>` : ""}</div>`;
-          li.onclick = () => {
-            li.classList.toggle("done");
-            done[id] = li.classList.contains("done");
-            li.querySelector(".box").textContent = done[id] ? "✓" : "";
-            localStorage.setItem(KEY, JSON.stringify(done));
-            updateProgress();
-            syncToSheet(false);
-          };
-          ul.appendChild(li);
+
+      function renderPlan() {
+        plan.innerHTML = "";
+        total = 0;
+        PLAN.forEach((phase, pi) => {
+          total += phase.tasks.length;
+          const sec = document.createElement("section");
+          sec.innerHTML = `<h2>${phase.title}</h2><p class="section-note">${phase.note}</p>`;
+          const ul = document.createElement("ul");
+          phase.tasks.forEach((task, ti) => {
+            const id = `${pi}-${ti}`;
+            const li = document.createElement("li");
+            if (done[id]) li.classList.add("done");
+            li.innerHTML = `
+              <div class="box">${done[id] ? "✓" : ""}</div>
+              <div class="text">${task.text}${task.sub ? `<small>${task.sub}</small>` : ""}</div>`;
+            li.onclick = () => {
+              if (!newbieName) { alert("Please sign in with your name first."); return; }
+              li.classList.toggle("done");
+              done[id] = li.classList.contains("done");
+              li.querySelector(".box").textContent = done[id] ? "✓" : "";
+              localStorage.setItem(KEY, JSON.stringify(done));
+              updateProgress();
+              syncToSheet();
+            };
+            ul.appendChild(li);
+          });
+          sec.appendChild(ul);
+          plan.appendChild(sec);
         });
-        sec.appendChild(ul);
-        plan.appendChild(sec);
-      });
+        updateProgress();
+      }
+      renderPlan();
+
+      // Returning user: load their latest progress from the sheet
+      if (newbieName) restoreFromSheet();
 
       function updateProgress() {
         const doneCount = Object.values(done).filter(Boolean).length;
@@ -294,8 +324,9 @@
       updateProgress();
 
       document.getElementById("resetBtn").onclick = () => {
-        if (confirm("Reset all progress? Use this when a new hire starts with this page.")) {
+        if (confirm("Reset all progress on THIS device? (Your sheet record stays until you check tasks again.)")) {
           localStorage.removeItem(KEY);
+          localStorage.removeItem(NAME_KEY);
           location.reload();
         }
       };
