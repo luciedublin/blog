@@ -6,7 +6,7 @@
     <title>Lucie Heymann — Resume</title>
     <link
       rel="icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230b1220'/%3E%3Ctext x='50' y='68' font-family='Georgia, serif' font-size='48' fill='%237dd3fc' text-anchor='middle'%3ELH%3C/text%3E%3C/svg%3E"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23212A31'/%3E%3Ctext x='50' y='68' font-size='48' fill='%23D3D9D4' text-anchor='middle'%3ELH%3C/text%3E%3C/svg%3E"
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -16,26 +16,26 @@
     />
     <style>
       :root {
-        --bg: #0a0f1c;
-        --bg-soft: #0f172a;
-        --text: #e2e8f0;
-        --muted: #8395ad;
-        --accent: #38bdf8;
-        --accent-2: #6366f1;
-        --accent-soft: rgba(56, 189, 248, 0.12);
-        --border: #1e293b;
-        --card: #0f172a;
+        --bg: #212A31;
+        --bg-soft: #2E3944;
+        --text: #D3D9D4;
+        --muted: #748D92;
+        --accent: #124E66;
+        --accent-bright: #4f7f96;
+        --accent-soft: rgba(18, 78, 102, 0.45);
+        --border: #2E3944;
+        --card: #2E3944;
       }
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body {
         font-family: "Inter", "Segoe UI", -apple-system, sans-serif;
-        background: var(--bg);
-        background-image: radial-gradient(
-          ellipse 80% 50% at 50% -10%,
-          var(--accent-soft),
-          transparent 70%
-        );
-        background-repeat: no-repeat;
+        background-color: var(--bg);
+        background-image:
+          radial-gradient(ellipse 60% 45% at 15% -5%, rgba(18, 78, 102, 0.55), transparent 70%),
+          radial-gradient(ellipse 50% 40% at 85% 5%, rgba(116, 141, 146, 0.25), transparent 70%),
+          linear-gradient(180deg, transparent 240px, rgba(33, 42, 49, 0.9) 420px, var(--bg) 600px),
+          url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cpath d='M64 0H0v64' fill='none' stroke='%232E3944' stroke-width='1' stroke-opacity='0.5'/%3E%3C/svg%3E");
+        background-attachment: fixed;
         color: var(--text);
         line-height: 1.7;
         max-width: 760px;
@@ -44,10 +44,21 @@
       }
       /* ---------- Hero ---------- */
       .hero {
+        position: relative;
         text-align: center;
         padding: 24px 0 44px;
         border-bottom: 1px solid var(--border);
         margin-bottom: 44px;
+      }
+      .hero::before {
+        content: "";
+        position: absolute;
+        top: -40px; left: 50%;
+        width: 420px; height: 420px;
+        transform: translateX(-50%);
+        background: radial-gradient(circle, rgba(18, 78, 102, 0.35) 0%, transparent 65%);
+        filter: blur(40px);
+        pointer-events: none;
       }
       .avatar {
         width: 148px;
@@ -63,20 +74,20 @@
         object-fit: cover;
         border: 3px solid transparent;
         background-clip: padding-box;
-        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.35), 0 0 30px rgba(99, 102, 241, 0.25), 0 12px 40px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 0 0 3px rgba(18, 78, 102, 0.55), 0 0 30px rgba(18, 78, 102, 0.45), 0 12px 40px rgba(0, 0, 0, 0.5);
       }
       h1 {
         font-family: "Plus Jakarta Sans", "Inter", sans-serif;
         font-size: 2.6rem;
         font-weight: 700;
         letter-spacing: -0.03em;
-        background: linear-gradient(180deg, #f8fafc 20%, #94a3b8);
+        background: linear-gradient(180deg, #D3D9D4 20%, #748D92);
         -webkit-background-clip: text;
         background-clip: text;
         -webkit-text-fill-color: transparent;
       }
       .tagline {
-        background: linear-gradient(90deg, var(--accent), var(--accent-2));
+        background: linear-gradient(90deg, #748D92, #D3D9D4);
         -webkit-background-clip: text;
         background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -114,10 +125,7 @@
       .skills span:hover { border-color: var(--accent); }
       .skills span strong {
         font-weight: normal;
-        background: linear-gradient(90deg, var(--accent), var(--accent-2));
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: var(--accent-bright);
       }
       /* ---------- Experience cards ---------- */
       .entry {
@@ -129,9 +137,9 @@
         transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
       }
       .entry:hover {
-        border-color: rgba(56, 189, 248, 0.5);
+        border-color: rgba(79, 127, 150, 0.6);
         transform: translateY(-2px);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 0 20px rgba(56, 189, 248, 0.08);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 0 20px rgba(18, 78, 102, 0.25);
       }
       .entry .top {
         display: flex;
@@ -145,10 +153,7 @@
         font-weight: 600;
       }
       .entry .where {
-        background: linear-gradient(90deg, var(--accent), var(--accent-2));
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: var(--accent-bright);
         font-size: 0.85rem;
       }
       .entry .when { color: var(--muted); font-size: 0.8rem; white-space: nowrap; }
@@ -164,18 +169,21 @@
         display: inline-block;
         margin-top: 14px;
         text-decoration: none;
-        background: linear-gradient(90deg, var(--accent), var(--accent-2));
-        color: #060b16;
-        font-weight: bold;
+        background: var(--accent);
+        color: #D3D9D4;
+        font-weight: 600;
+        border: 1px solid var(--accent-bright);
         border-radius: 999px;
         padding: 9px 26px;
         font-size: 0.85rem;
         transition: all 0.2s ease;
-        box-shadow: 0 4px 16px rgba(56, 189, 248, 0.25);
+        box-shadow: 0 4px 16px rgba(18, 78, 102, 0.4);
       }
       .project-btn:hover {
         transform: translateY(-1px);
-        box-shadow: 0 6px 22px rgba(56, 189, 248, 0.45);
+        background: var(--accent-bright);
+        color: #212A31;
+        box-shadow: 0 6px 22px rgba(18, 78, 102, 0.6);
       }
       /* ---------- Contact ---------- */
       .contact {
@@ -196,10 +204,10 @@
         transition: all 0.15s ease;
       }
       .contact a:hover {
-        border-color: var(--accent);
-        color: var(--accent);
+        border-color: var(--accent-bright);
+        color: #D3D9D4;
         transform: translateY(-1px);
-        box-shadow: 0 0 16px rgba(56, 189, 248, 0.2);
+        box-shadow: 0 0 16px rgba(18, 78, 102, 0.5);
       }
       footer {
         margin-top: 48px;
